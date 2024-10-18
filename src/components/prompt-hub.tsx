@@ -17,9 +17,9 @@ interface Prompt {
   description: string
   tags: string[]
   meta: {
-    authors: string[]
+    author: string[]
+    institution: string
   }
-  version: string
 }
 
 export default function PromptHub() {
@@ -33,13 +33,23 @@ export default function PromptHub() {
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
-        // const response = await fetch('https://prompthub-production.up.railway.app/prompts')
         const response = await fetch('http://localhost:80/prompts')
         const data = await response.json()
-        setPrompts(data)
+        // Transform the data to match the new Prompt interface
+        const transformedData = data.map((prompt: any) => ({
+          ...prompt,
+          tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
+            ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
+            : prompt.tags,
+          meta: {
+            author: prompt.meta.author,
+            institution: prompt.meta.institution
+          }
+        }))
+        setPrompts(transformedData)
         
         // Extract unique tags from prompts
-        const allTags = data.flatMap((prompt: Prompt) => prompt.tags)
+        const allTags = transformedData.flatMap((prompt: Prompt) => prompt.tags)
         const uniqueTagsSet = new Set(allTags)
         setUniqueTags(Array.from(uniqueTagsSet) as string[])
       } catch (error) {
@@ -49,7 +59,21 @@ export default function PromptHub() {
 
     fetchPrompts()
   }, [])
- 
+
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCloseDescription()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeKey)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [])
+
   const filteredPrompts = prompts.filter(prompt =>
     prompt.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (selectedTag === 'all' || prompt.tags.includes(selectedTag))
@@ -133,9 +157,9 @@ export default function PromptHub() {
                 <p className="text-sm text-gray-500 mb-2">{prompt.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {prompt.tags.map((tag, tagIndex) => (
-                    <span key={tagIndex} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    <Badge key={tagIndex} variant="secondary">
                       {tag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </CardContent>
@@ -146,8 +170,8 @@ export default function PromptHub() {
         {selectedPrompt && (
           <FloatingDescription
             name={selectedPrompt.name}
-            version={selectedPrompt.version}
-            authors={selectedPrompt.meta.authors}
+            authors={selectedPrompt.meta.author}
+            institution={selectedPrompt.meta.institution}
             text={selectedPrompt.text}
             onClose={handleCloseDescription}
           />
