@@ -6,11 +6,12 @@ import { Copy, Check, X } from 'lucide-react'
 interface FloatingDescriptionProps {
   name: string
   version: string
+  authors: string[] // Add authors prop
   text: string
   onClose: () => void
 }
 
-export function FloatingDescription({ name, version, text, onClose }: FloatingDescriptionProps) {
+export function FloatingDescription({ name, version, authors, text, onClose }: FloatingDescriptionProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -21,12 +22,13 @@ export function FloatingDescription({ name, version, text, onClose }: FloatingDe
 
   return (
     <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto z-50 shadow-xl bg-white">
-      <CardHeader className="flex flex-row justify-between items-center border-b pb-4">
-        <div>
+      <CardHeader className="flex flex-row justify-between items-start border-b pb-4">
+        <div className="flex-grow">
           <CardTitle className="text-2xl font-bold text-gray-800">{name}</CardTitle>
           <p className="text-sm text-gray-500 mt-1">Version: {version}</p>
+          <p className="text-sm text-gray-500 mb-4">Authors: {authors.join(', ')}</p>
         </div>
-        <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700 -mt-2 ml-4">
           <X size={24} />
         </Button>
       </CardHeader>
