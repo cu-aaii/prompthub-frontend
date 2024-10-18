@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, X } from 'lucide-react'
 
 interface FloatingDescriptionProps {
   name: string
@@ -20,23 +20,38 @@ export function FloatingDescription({ name, version, text, onClose }: FloatingDe
   }
 
   return (
-    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] max-h-[80vh] overflow-y-auto z-50 shadow-lg">
-      <CardHeader className="flex flex-row justify-between items-start">
+    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto z-50 shadow-xl bg-white">
+      <CardHeader className="flex flex-row justify-between items-center border-b pb-4">
         <div>
-          <CardTitle>{name}</CardTitle>
-          <div className="text-sm text-gray-500 mt-1">
-            <span>{version}</span>
-          </div>
+          <CardTitle className="text-2xl font-bold text-gray-800">{name}</CardTitle>
+          <p className="text-sm text-gray-500 mt-1">Version: {version}</p>
         </div>
-        <Button variant="ghost" onClick={onClose}>×</Button>
+        <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <X size={24} />
+        </Button>
       </CardHeader>
-      <CardContent>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto whitespace-pre-wrap">
-          {text}
-        </pre>
-        <Button className="mt-4" onClick={handleCopy}>
-          {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
-          {copied ? 'Copied!' : 'Copy'}
+      <CardContent className="pt-6">
+        <div className="bg-gray-50 p-6 rounded-lg mb-6">
+          <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+            {text}
+          </pre>
+        </div>
+        <Button 
+          onClick={handleCopy} 
+          className="w-full justify-center py-2 transition-colors duration-200"
+          variant={copied ? "outline" : "default"}
+        >
+          {copied ? (
+            <>
+              <Check className="h-5 w-5 mr-2" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy className="h-5 w-5 mr-2" />
+              Copy Prompt
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

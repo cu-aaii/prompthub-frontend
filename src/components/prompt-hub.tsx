@@ -45,7 +45,7 @@ export default function PromptHub() {
 
     fetchPrompts()
   }, [])
-
+ 
   const filteredPrompts = selectedTag === 'all'
     ? prompts
     : prompts.filter(prompt => prompt.tags.includes(selectedTag))
@@ -134,7 +134,6 @@ export default function PromptHub() {
           <FloatingDescription
             name={selectedPrompt.name}
             version={selectedPrompt.version}
-            authors={selectedPrompt.meta.authors}
             text={selectedPrompt.text}
             onClose={handleCloseDescription}
           />
