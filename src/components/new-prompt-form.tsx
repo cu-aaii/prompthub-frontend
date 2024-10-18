@@ -43,7 +43,22 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('http://localhost:80/prompts/request', {
+    //   const response = await fetch('http://localhost:80/prompts/request', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       name: formData.name,
+    //       institution: formData.institution,
+    //       email: formData.email,
+    //       tags: formData.tags.split(',').map(tag => tag.trim()), // Convert comma-separated string to array
+    //       promptName: formData.promptName,
+    //       promptText: formData.promptText,
+    //       description: formData.description
+    //     }),
+    //   })
+    const response = await fetch('https://prompthub-production.up.railway.app/prompts/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

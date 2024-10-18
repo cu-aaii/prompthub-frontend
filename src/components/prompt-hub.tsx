@@ -33,7 +33,8 @@ export default function PromptHub() {
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
-        const response = await fetch('http://localhost:80/prompts')
+        // const response = await fetch('http://localhost:80/prompts')
+        const response = await fetch('https://prompthub-production.up.railway.app/prompts')
         const data = await response.json()
         // Transform the data to match the new Prompt interface
         const transformedData = data.map((prompt: any) => ({
