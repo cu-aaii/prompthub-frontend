@@ -1,32 +1,79 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Filter, ThumbsUp } from "lucide-react"
+import { Search, Filter } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { FloatingDescription } from './floating-description'
+import { Overlay } from './overlay'
+
+interface Prompt {
+  name: string
+  text: string
+  description: string
+  tags: string[]
+  meta: {
+    authors: string[]
+  }
+  version: string
+}
 
 export default function PromptHub() {
+  const [prompts, setPrompts] = useState<Prompt[]>([])
+  const [uniqueTags, setUniqueTags] = useState<string[]>([])
+  const [selectedTag, setSelectedTag] = useState<string>('all')
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
+
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      try {
+        const response = await fetch('http://localhost:80/prompts')
+        const data = await response.json()
+        setPrompts(data)
+        
+        // Extract unique tags from prompts
+        const allTags = data.flatMap((prompt: Prompt) => prompt.tags)
+        const uniqueTagsSet = new Set(allTags)
+        setUniqueTags(Array.from(uniqueTagsSet))
+      } catch (error) {
+        console.error('Error fetching prompts:', error)
+      }
+    }
+
+    fetchPrompts()
+  }, [])
+
+  const filteredPrompts = selectedTag === 'all'
+    ? prompts
+    : prompts.filter(prompt => prompt.tags.includes(selectedTag))
+
+  // Sort the filtered prompts alphabetically by name
+  const sortedPrompts = [...filteredPrompts].sort((a, b) => 
+    a.name.localeCompare(b.name)
+  )
+
+  const handleTagChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTag(event.target.value)
+  }
+
+  const handleCardClick = (prompt: Prompt) => {
+    setSelectedPrompt(prompt)
+  }
+
+  const handleCloseDescription = () => {
+    setSelectedPrompt(null)
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="container mx-auto py-8">
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link href="/" className="text-2xl font-bold text-blue-600">
-              PromptHub
-            </Link>
-            <nav className="hidden md:flex space-x-4">
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
-                Explore
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
-                Create
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
-                About
-              </Link>
-            </nav>
-          </div>
-          <Button variant="outline">Sign In</Button>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-start">
+          <Link href="/" className="text-2xl font-bold text-blue-600">
+            PromptHub
+          </Link>
         </div>
       </header>
       <main className="flex-grow container mx-auto px-4 py-8">
@@ -42,11 +89,15 @@ export default function PromptHub() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             </div>
             <div className="flex gap-2">
-              <select className="w-[180px] px-3 py-2 rounded-md border border-input bg-background text-sm">
-                <option value="all">All Categories</option>
-                <option value="qa">Question Answering</option>
-                <option value="summarization">Summarization</option>
-                <option value="generation">Text Generation</option>
+              <select
+                className="w-[180px] px-3 py-2 rounded-md border border-input bg-background text-sm"
+                value={selectedTag}
+                onChange={handleTagChange}
+              >
+                <option value="all">All Tags</option>
+                {uniqueTags.map((tag, index) => (
+                  <option key={index} value={tag}>{tag}</option>
+                ))}
               </select>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter size={20} />
@@ -55,38 +106,43 @@ export default function PromptHub() {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {sortedPrompts.map((prompt, index) => (
+            <Card 
+              key={index} 
+              className="flex flex-col cursor-pointer border-2 border-transparent hover:border-green-500" 
+              onClick={() => handleCardClick(prompt)}
+            >
               <CardHeader>
-                <CardTitle className="text-lg">Sample Prompt {i + 1}</CardTitle>
+                <CardTitle>{prompt.name}</CardTitle>
               </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-sm text-gray-600 mb-4">
-                  This is a sample prompt description. It showcases what the prompt does and how it can be used.
-                </p>
+              <CardContent>
+                <p className="text-sm text-gray-500 mb-2">{prompt.description}</p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Category</Badge>
-                  <Badge variant="secondary">Tag 1</Badge>
-                  <Badge variant="secondary">Tag 2</Badge>
+                  {prompt.tags.map((tag, tagIndex) => (
+                    <span key={tagIndex} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <ThumbsUp size={16} />
-                  <span className="text-sm text-gray-600">42</span>
-                </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </CardFooter>
             </Card>
           ))}
         </div>
+        <Overlay isVisible={!!selectedPrompt} onClose={handleCloseDescription} />
+        {selectedPrompt && (
+          <FloatingDescription
+            name={selectedPrompt.name}
+            version={selectedPrompt.version}
+            authors={selectedPrompt.meta.authors}
+            text={selectedPrompt.text}
+            onClose={handleCloseDescription}
+          />
+        )}
       </main>
       <footer className="border-t py-4 text-center text-sm text-gray-600">
         <div className="container mx-auto px-4">
-          © 2023 PromptHub. All rights reserved.
+          © 2024 PromptHub. All rights reserved.
         </div>
       </footer>
     </div>
