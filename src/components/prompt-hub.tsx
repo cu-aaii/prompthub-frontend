@@ -37,7 +37,7 @@ export default function PromptHub() {
         // Extract unique tags from prompts
         const allTags = data.flatMap((prompt: Prompt) => prompt.tags)
         const uniqueTagsSet = new Set(allTags)
-        setUniqueTags(Array.from(uniqueTagsSet))
+        setUniqueTags(Array.from(uniqueTagsSet) as string[])
       } catch (error) {
         console.error('Error fetching prompts:', error)
       }
