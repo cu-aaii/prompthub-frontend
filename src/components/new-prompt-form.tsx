@@ -67,7 +67,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           name: formData.name,
           institution: formData.institution,
           email: formData.email,
-          tags: formData.tags.split(',').map(tag => tag.trim()), // Convert comma-separated string to array
+          tags: formData.tags,
           promptName: formData.promptName,
           promptText: formData.promptText,
           description: formData.description
