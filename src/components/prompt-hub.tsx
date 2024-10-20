@@ -161,7 +161,7 @@ export default function PromptHub() {
               <CardContent>
                 <p className="text-sm text-gray-500 mb-2">{prompt.text}</p>
                 <p className="text-sm text-blue-500 mb-2">
-                  {selectedPrompt === prompt ? prompt.description : "Click on the card to see Usage Information"}
+                  {"Click on the card to see Usage Information"}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {prompt.tags.map((tag, tagIndex) => (
@@ -181,6 +181,7 @@ export default function PromptHub() {
             authors={selectedPrompt.meta.author}
             institution={selectedPrompt.meta.institution}
             text={selectedPrompt.text}
+            description={selectedPrompt.description}
             onClose={handleCloseDescription}
           />
         )}

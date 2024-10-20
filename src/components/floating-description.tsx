@@ -8,10 +8,18 @@ interface FloatingDescriptionProps {
   authors: string[]
   institution: string
   text: string
+  description: string
   onClose: () => void
 }
 
-export function FloatingDescription({ name, authors, institution, text, onClose }: FloatingDescriptionProps) {
+export function FloatingDescription({
+  name,
+  authors,
+  institution,
+  text,
+  description,
+  onClose
+}: FloatingDescriptionProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -21,41 +29,38 @@ export function FloatingDescription({ name, authors, institution, text, onClose 
   }
 
   return (
-    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto z-50 shadow-xl bg-white">
-      <CardHeader className="flex flex-row justify-between items-start border-b pb-4">
-        <div className="flex-grow">
-          <CardTitle className="text-2xl font-bold text-gray-800">{name}</CardTitle>
-          <p className="text-sm text-gray-500 mt-1">Authors: {authors.join(', ')}</p>
-          <p className="text-sm text-gray-500 mb-4">Institution: {institution}</p>
-        </div>
-        <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700 -mt-2 ml-4">
-          <X size={24} />
-        </Button>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
-            {text}
-          </pre>
-        </div>
-        <Button 
-          onClick={handleCopy} 
-          className="w-full justify-center py-2 transition-colors duration-200"
-          variant={copied ? "outline" : "default"}
-        >
-          {copied ? (
-            <>
-              <Check className="h-5 w-5 mr-2" />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Copy className="h-5 w-5 mr-2" />
-              Copy Prompt
-            </>
-          )}
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-2xl font-bold">{name}</CardTitle>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 mb-4">{text}</p>
+          <h3 className="text-lg font-semibold mb-2">Usage Information:</h3>
+          <p className="text-gray-600 mb-4">{description}</p>
+          <div className="flex items-center space-x-2 mt-4">
+            <Button onClick={handleCopy} variant="outline">
+              {copied ? (
+                <Check className="mr-2 h-4 w-4" />
+              ) : (
+                <Copy className="mr-2 h-4 w-4" />
+              )}
+              {copied ? 'Copied' : 'Copy Prompt'}
+            </Button>
+          </div>
+          <div className="mt-4">
+            <p className="text-sm text-gray-500">
+              Authors: {authors.join(', ')}
+            </p>
+            <p className="text-sm text-gray-500">
+              Institution: {institution}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
