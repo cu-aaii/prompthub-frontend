@@ -159,7 +159,10 @@ export default function PromptHub() {
                 <CardTitle>{prompt.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-2">{prompt.description}</p>
+                <p className="text-sm text-gray-500 mb-2">{prompt.text}</p>
+                <p className="text-sm text-blue-500 mb-2">
+                  {selectedPrompt === prompt ? prompt.description : "Click on the card to see Usage Information"}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {prompt.tags.map((tag, tagIndex) => (
                     <Badge key={tagIndex} variant="secondary">
