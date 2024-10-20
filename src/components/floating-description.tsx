@@ -44,7 +44,7 @@ export function FloatingDescription({
           </div>
           
           <div className="mb-4 bg-gray-100 p-4 rounded-md">
-            <p className="mb-2">{text}</p>
+            <pre className="whitespace-pre-wrap mb-2">{text}</pre>
             <Button 
               onClick={handleCopyPrompt}
               className={copied ? "bg-green-500 hover:bg-green-600" : ""}
@@ -61,7 +61,7 @@ export function FloatingDescription({
           
           <div className="bg-blue-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-2">Usage Information</h3>
-            <p>{description}</p>
+            <pre className="whitespace-pre-wrap">{description}</pre>
           </div>
         </div>
       </div>

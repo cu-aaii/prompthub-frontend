@@ -70,7 +70,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     setIsSubmitting(true)
 
     try {
-    //  http://localhost:80/prompts/request
+    // http://localhost:80/prompts/request
     const response = await fetch('https://prompthub-production.up.railway.app/prompts/request', {
         method: 'POST',
         headers: {

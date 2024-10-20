@@ -159,7 +159,9 @@ export default function PromptHub() {
                 <CardTitle>{prompt.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 mb-2">{prompt.text}</p>
+                <pre className="text-sm text-gray-500 mb-2 whitespace-pre-wrap overflow-hidden" style={{ maxHeight: '100px' }}>
+                  {prompt.text}
+                </pre>
                 <p className="text-sm text-blue-500 mb-2">
                   {"Click on the card to see Usage Information"}
                 </p>
