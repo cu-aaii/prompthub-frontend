@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { FloatingDescription } from './floating-description'
 import { Overlay } from './overlay'
 import { NewPromptForm } from './new-prompt-form'
@@ -30,36 +30,40 @@ export default function PromptHub() {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [isNewPromptFormOpen, setIsNewPromptFormOpen] = useState(false)
 
-  useEffect(() => {
-    const fetchPrompts = async () => {
-      try {
-        // const response = await fetch('http://localhost:80/prompts')
-        const response = await fetch('https://prompthub-production.up.railway.app/prompts')
-        const data = await response.json()
-        // Transform the data to match the new Prompt interface
-        const transformedData = data.map((prompt: any) => ({
-          ...prompt,
-          tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
-            ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
-            : prompt.tags,
-          meta: {
-            author: prompt.meta.author,
-            institution: prompt.meta.institution
-          }
-        }))
-        setPrompts(transformedData)
-        
-        // Extract unique tags from prompts
-        const allTags = transformedData.flatMap((prompt: Prompt) => prompt.tags)
-        const uniqueTagsSet = new Set(allTags)
-        setUniqueTags(Array.from(uniqueTagsSet) as string[])
-      } catch (error) {
-        console.error('Error fetching prompts:', error)
-      }
+  const fetchPrompts = useCallback(async () => {
+    try {
+      // http://localhost:80/prompts
+      const response = await fetch('https://prompthub-production.up.railway.app/prompts')
+      const data = await response.json()
+      const transformedData = data.map((prompt: any) => ({
+        ...prompt,
+        tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
+          ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
+          : prompt.tags,
+        meta: {
+          author: prompt.meta.author,
+          institution: prompt.meta.institution
+        }
+      }))
+      setPrompts(transformedData)
+      
+      const allTags = transformedData.flatMap((prompt: Prompt) => prompt.tags)
+      const uniqueTagsSet = new Set(allTags)
+      setUniqueTags(Array.from(uniqueTagsSet) as string[])
+    } catch (error) {
+      console.error('Error fetching prompts:', error)
     }
-
-    fetchPrompts()
   }, [])
+
+  useEffect(() => {
+    fetchPrompts() // Initial fetch
+
+    const intervalId = setInterval(() => {
+      fetchPrompts()
+    }, 1000) // Fetch every 1000 ms (1 second)
+
+    return () => clearInterval(intervalId) // Cleanup on component unmount
+  }, [fetchPrompts])
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {

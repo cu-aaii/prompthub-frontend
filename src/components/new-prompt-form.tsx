@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -31,7 +31,23 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     description: 'This is a sample description for the prompt. It provides usage information and examples.'
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [existingPromptNames, setExistingPromptNames] = useState<string[]>([])
   const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchExistingPromptNames = async () => {
+      try {
+        const response = await fetch('http://localhost:80/prompts')
+        const data = await response.json()
+        const names = data.map((prompt: any) => prompt.name.toLowerCase())
+        setExistingPromptNames(names)
+      } catch (error) {
+        console.error('Error fetching existing prompt names:', error)
+      }
+    }
+
+    fetchExistingPromptNames()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -40,24 +56,20 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (existingPromptNames.includes(formData.promptName.toLowerCase())) {
+      toast({
+        title: "Error",
+        description: "A prompt with this name already exists. Please choose a different name.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-    //   const response = await fetch('http://localhost:80/prompts/request', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       name: formData.name,
-    //       institution: formData.institution,
-    //       email: formData.email,
-    //       tags: formData.tags.split(',').map(tag => tag.trim()), // Convert comma-separated string to array
-    //       promptName: formData.promptName,
-    //       promptText: formData.promptText,
-    //       description: formData.description
-    //     }),
-    //   })
+    //  https://prompthub-production.up.railway.app/prompts/request
     const response = await fetch('https://prompthub-production.up.railway.app/prompts/request', {
         method: 'POST',
         headers: {
