@@ -22,14 +22,23 @@ interface NewPromptFormProps {
 
 export function NewPromptForm({ onClose }: NewPromptFormProps) {
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    institution: 'University of Chicago',
-    email: 'john.doe@example.com',
-    tags: 'AI, Machine Learning, Data Science',
-    promptName: 'Sample Prompt',
-    promptText: 'This is a sample prompt text for testing purposes.',
-    description: 'This is a sample description for the prompt. It provides usage information and examples.'
+    name: '',
+    institution: '',
+    email: '',
+    tags: '',
+    promptName: '',
+    promptText: '',
+    description: ''
   })
+  // const [formData, setFormData] = useState({
+  //   name: 'John Doe',
+  //   institution: 'University of Chicago',
+  //   email: 'john.doe@example.com',
+  //   tags: 'AI, Machine Learning, Data Science',
+  //   promptName: 'Sample Prompt',
+  //   promptText: 'This is a sample prompt text for testing purposes.',
+  //   description: 'This is a sample description for the prompt. It provides usage information and examples.'
+  // })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [existingPromptNames, setExistingPromptNames] = useState<string[]>([])
   const { toast } = useToast()
