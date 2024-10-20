@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { X, Check } from "lucide-react"
 
 interface FloatingDescriptionProps {
   name: string
@@ -19,9 +19,12 @@ export function FloatingDescription({
   description,
   onClose
 }: FloatingDescriptionProps) {
+  const [copied, setCopied] = useState(false)
+
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(text)
-    // Optionally, you can add a toast notification here to inform the user that the text has been copied
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000) // Reset after 2 seconds
   }
 
   return (
@@ -42,7 +45,18 @@ export function FloatingDescription({
           
           <div className="mb-4 bg-gray-100 p-4 rounded-md">
             <p className="mb-2">{text}</p>
-            <Button onClick={handleCopyPrompt}>Copy Prompt</Button>
+            <Button 
+              onClick={handleCopyPrompt}
+              className={copied ? "bg-green-500 hover:bg-green-600" : ""}
+            >
+              {copied ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" /> Copied!
+                </>
+              ) : (
+                "Copy Prompt"
+              )}
+            </Button>
           </div>
           
           <div className="bg-blue-50 p-4 rounded-md">
