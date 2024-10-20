@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Button } from './ui/button'
-import { Copy, Check, X } from 'lucide-react'
+import React from 'react'
+import { Button } from "@/components/ui/button"
+import { X } from "lucide-react"
 
 interface FloatingDescriptionProps {
   name: string
@@ -20,47 +19,38 @@ export function FloatingDescription({
   description,
   onClose
 }: FloatingDescriptionProps) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
+  const handleCopyPrompt = () => {
     navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    // Optionally, you can add a toast notification here to inform the user that the text has been copied
   }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">{name}</CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 mb-4">{text}</p>
-          <h3 className="text-lg font-semibold mb-2">Usage Information:</h3>
-          <p className="text-gray-600 mb-4">{description}</p>
-          <div className="flex items-center space-x-2 mt-4">
-            <Button onClick={handleCopy} variant="outline">
-              {copied ? (
-                <Check className="mr-2 h-4 w-4" />
-              ) : (
-                <Copy className="mr-2 h-4 w-4" />
-              )}
-              {copied ? 'Copied' : 'Copy Prompt'}
-            </Button>
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-2xl font-bold">{name}</h2>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X size={24} />
+            </button>
           </div>
-          <div className="mt-4">
-            <p className="text-sm text-gray-500">
-              Authors: {authors.join(', ')}
-            </p>
-            <p className="text-sm text-gray-500">
-              Institution: {institution}
-            </p>
+          
+          <div className="mb-4 text-sm text-gray-600">
+            <p>Authors: {authors.join(', ')}</p>
+            <p>Institution: {institution}</p>
           </div>
-        </CardContent>
-      </Card>
+          
+          <div className="mb-4 bg-gray-100 p-4 rounded-md">
+            <p className="mb-2">{text}</p>
+            <Button onClick={handleCopyPrompt}>Copy Prompt</Button>
+          </div>
+          
+          <div className="bg-blue-50 p-4 rounded-md">
+            <h3 className="text-lg font-semibold mb-2">Usage Information</h3>
+            <p>{description}</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
