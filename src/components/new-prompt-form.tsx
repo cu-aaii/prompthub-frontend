@@ -156,16 +156,16 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="tags">Tags (comma-separated)</Label>
-            <Input id="tags" name="tags" value={formData.tags} onChange={handleChange} required />
-          </div>
-          <div>
             <Label htmlFor="promptName">Prompt Title</Label>
             <Input id="promptName" name="promptName" value={formData.promptName} onChange={handleChange} required />
           </div>
           <div>
             <Label htmlFor="promptText">Prompt Text</Label>
             <Textarea id="promptText" name="promptText" value={formData.promptText} onChange={handleChange} required />
+          </div>
+          <div>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input id="tags" name="tags" value={formData.tags} onChange={handleChange} required />
           </div>
           <div>
             <Label htmlFor="description">Usage Information</Label>
