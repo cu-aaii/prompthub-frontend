@@ -94,7 +94,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
       const result = await response.json()
       toast({
         title: "Success",
-        description: "Your prompt request has been submitted successfully.",
+        description: "Your prompt request has been submitted successfully. We'll notify you of the response to your request at the email address you provided.",
       })
       onClose()
     } catch (error) {
