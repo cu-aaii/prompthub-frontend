@@ -37,7 +37,8 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
   useEffect(() => {
     const fetchExistingPromptNames = async () => {
       try {
-        const response = await fetch('http://localhost:80/prompts')
+        // http://localhost:80/prompts
+        const response = await fetch('https://prompthub-production.up.railway.app/prompts')
         const data = await response.json()
         const names = data.map((prompt: any) => prompt.name.toLowerCase())
         setExistingPromptNames(names)
@@ -69,7 +70,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     setIsSubmitting(true)
 
     try {
-    //  https://prompthub-production.up.railway.app/prompts/request
+    //  http://localhost:80/prompts/request
     const response = await fetch('https://prompthub-production.up.railway.app/prompts/request', {
         method: 'POST',
         headers: {
