@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, Suspense } from "react"
 import { FloatingDescription } from './floating-description'
 import { Overlay } from './overlay'
 import { NewPromptForm } from './new-prompt-form'
@@ -29,7 +29,7 @@ interface Prompt {
 }
 
 
-export default function PromptHub() {
+function PromptHubContent() {
   const [prompts, setPrompts] = useState<Prompt[]>([])
   const [uniqueTags, setUniqueTags] = useState<string[]>([])
   const [selectedTag, setSelectedTag] = useState<string>('all')
@@ -38,8 +38,6 @@ export default function PromptHub() {
   const [isNewPromptFormOpen, setIsNewPromptFormOpen] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  const pathname = usePathname()
 
   const fetchPrompts = useCallback(async () => {
     try {
@@ -244,5 +242,13 @@ export default function PromptHub() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function PromptHub() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PromptHubContent />
+    </Suspense>
   )
 }
