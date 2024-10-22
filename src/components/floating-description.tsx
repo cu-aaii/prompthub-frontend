@@ -31,10 +31,10 @@ export function FloatingDescription({
   }
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/prompts/${id}`
+    const link = `${window.location.origin}/?id=${id}`
     navigator.clipboard.writeText(link)
     setLinkCopied(true)
-    setTimeout(() => setLinkCopied(false), 2000) // Reset after 2 seconds
+    setTimeout(() => setLinkCopied(false), 2000)
   }
 
   return (

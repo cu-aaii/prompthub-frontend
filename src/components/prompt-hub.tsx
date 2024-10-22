@@ -13,10 +13,11 @@ import { Overlay } from './overlay'
 import { NewPromptForm } from './new-prompt-form'
 import Logo from '@/assets/logo.svg'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 
 interface Prompt {
-  id: string
+  ID: string
   name: string
   text: string
   description: string
@@ -35,26 +36,31 @@ export default function PromptHub() {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [isNewPromptFormOpen, setIsNewPromptFormOpen] = useState(false)
-  
-  const pathname = usePathname()
+  const router = useRouter()
   const searchParams = useSearchParams()
+
+  const pathname = usePathname()
 
   const fetchPrompts = useCallback(async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts`)
       const data = await response.json()
-      const transformedData = data.map((prompt: any) => ({
-        ...prompt,
-        tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
-          ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
-          : prompt.tags,
-        meta: {
-          author: prompt.meta.author,
-          institution: prompt.meta.institution
+      const transformedData = data.map((prompt: any) => {
+        return {
+          ...prompt,
+          ID: prompt.ID,
+          tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
+            ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
+            : prompt.tags,
+          meta: {
+            author: Array.isArray(prompt.meta.author) 
+              ? prompt.meta.author 
+              : [prompt.meta.author],
+            institution: prompt.meta.institution
+          }
         }
-      }))
+      })
       setPrompts(transformedData)
-      
       const allTags = transformedData.flatMap((prompt: Prompt) => prompt.tags)
       const uniqueTagsSet = new Set(allTags)
       setUniqueTags(Array.from(uniqueTagsSet) as string[])
@@ -98,12 +104,12 @@ export default function PromptHub() {
 
   const handleCardClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt)
-    window.history.pushState({}, '', `/prompts/${prompt.id}`)
+    router.push(`/?id=${prompt.ID}`)
   }
 
   const handleCloseDescription = () => {
     setSelectedPrompt(null)
-    window.history.pushState({}, '', '/')
+    router.push('/')
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +128,7 @@ export default function PromptHub() {
     const handlePopState = () => {
       const promptId = window.location.pathname.split('/').pop()
       if (promptId && promptId !== 'prompts') {
-        const prompt = prompts.find(p => p.id === promptId)
+        const prompt = prompts.find(p => p.ID === promptId)
         if (prompt) {
           setSelectedPrompt(prompt)
         }
@@ -136,14 +142,16 @@ export default function PromptHub() {
   }, [prompts])
 
   useEffect(() => {
-    const promptId = pathname.split('/').pop()
-    if (promptId && promptId !== 'prompts') {
-      const prompt = prompts.find(p => p.id === promptId)
+    const id = searchParams.get('id')
+    if (id) {
+      const prompt = prompts.find(p => p.ID === id)
       if (prompt) {
         setSelectedPrompt(prompt)
+      } else {
+        console.error(`Prompt with ID ${id} not found`)
       }
     }
-  }, [pathname, prompts])
+  }, [searchParams, prompts])
 
   return (
     <div className="container mx-auto py-8">
@@ -189,7 +197,7 @@ export default function PromptHub() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           {filteredPrompts.map((prompt, index) => (
             <Card 
-              key={prompt.id} 
+              key={prompt.ID}
               className="flex flex-col cursor-pointer border-2 border-transparent hover:border-green-500" 
               onClick={() => handleCardClick(prompt)}
             >
@@ -217,7 +225,7 @@ export default function PromptHub() {
         <Overlay isVisible={!!selectedPrompt} onClose={handleCloseDescription} />
         {selectedPrompt && (
           <FloatingDescription
-            id={selectedPrompt.id}
+            id={selectedPrompt.ID}
             name={selectedPrompt.name}
             authors={selectedPrompt.meta.author}
             institution={selectedPrompt.meta.institution}
