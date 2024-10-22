@@ -6,12 +6,17 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { useEffect, useState, useCallback } from "react"
 import { FloatingDescription } from './floating-description'
 import { Overlay } from './overlay'
 import { NewPromptForm } from './new-prompt-form'
+import Logo from '@/assets/logo.svg'
+import { usePathname, useSearchParams } from 'next/navigation'
+
 
 interface Prompt {
+  id: string
   name: string
   text: string
   description: string
@@ -22,6 +27,7 @@ interface Prompt {
   }
 }
 
+
 export default function PromptHub() {
   const [prompts, setPrompts] = useState<Prompt[]>([])
   const [uniqueTags, setUniqueTags] = useState<string[]>([])
@@ -29,11 +35,13 @@ export default function PromptHub() {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [isNewPromptFormOpen, setIsNewPromptFormOpen] = useState(false)
+  
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const fetchPrompts = useCallback(async () => {
     try {
-      // http://localhost:80/prompts
-      const response = await fetch('https://prompthub-production.up.railway.app/prompts')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts`)
       const data = await response.json()
       const transformedData = data.map((prompt: any) => ({
         ...prompt,
@@ -90,10 +98,12 @@ export default function PromptHub() {
 
   const handleCardClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt)
+    window.history.pushState({}, '', `/prompts/${prompt.id}`)
   }
 
   const handleCloseDescription = () => {
     setSelectedPrompt(null)
+    window.history.pushState({}, '', '/')
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,19 +118,47 @@ export default function PromptHub() {
     setIsNewPromptFormOpen(false)
   }
 
+  useEffect(() => {
+    const handlePopState = () => {
+      const promptId = window.location.pathname.split('/').pop()
+      if (promptId && promptId !== 'prompts') {
+        const prompt = prompts.find(p => p.id === promptId)
+        if (prompt) {
+          setSelectedPrompt(prompt)
+        }
+      } else {
+        setSelectedPrompt(null)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [prompts])
+
+  useEffect(() => {
+    const promptId = pathname.split('/').pop()
+    if (promptId && promptId !== 'prompts') {
+      const prompt = prompts.find(p => p.id === promptId)
+      if (prompt) {
+        setSelectedPrompt(prompt)
+      }
+    }
+  }, [pathname, prompts])
+
   return (
     <div className="container mx-auto py-8">
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-start">
-          <Link href="/" className="text-2xl font-bold text-blue-600">
-            PromptHub
+          <Link href="/" className="flex items-center">
+            <Image src={Logo} alt="PromptHub Logo" width={32} height={32} className="mr-2" />
+            <span className="text-2xl font-bold text-blue-600">Higher Ed Prompt Hub</span>
           </Link>
         </div>
       </header>
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold">Explore Prompts</h1>
-          <Button onClick={handleNewPromptRequest}>Request new prompt</Button>
+          <Button onClick={handleNewPromptRequest}>Submit a request for a new prompt</Button>
         </div>
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-4">
@@ -151,7 +189,7 @@ export default function PromptHub() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           {filteredPrompts.map((prompt, index) => (
             <Card 
-              key={index} 
+              key={prompt.id} 
               className="flex flex-col cursor-pointer border-2 border-transparent hover:border-green-500" 
               onClick={() => handleCardClick(prompt)}
             >
@@ -179,6 +217,7 @@ export default function PromptHub() {
         <Overlay isVisible={!!selectedPrompt} onClose={handleCloseDescription} />
         {selectedPrompt && (
           <FloatingDescription
+            id={selectedPrompt.id}
             name={selectedPrompt.name}
             authors={selectedPrompt.meta.author}
             institution={selectedPrompt.meta.institution}

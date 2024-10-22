@@ -46,8 +46,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
   useEffect(() => {
     const fetchExistingPromptNames = async () => {
       try {
-        // http://localhost:80/prompts
-        const response = await fetch('https://prompthub-production.up.railway.app/prompts')
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts`)
         const data = await response.json()
         const names = data.map((prompt: any) => prompt.name.toLowerCase())
         setExistingPromptNames(names)
@@ -79,8 +78,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     setIsSubmitting(true)
 
     try {
-    // http://localhost:80/prompts/request
-    const response = await fetch('https://prompthub-production.up.railway.app/prompts/request', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

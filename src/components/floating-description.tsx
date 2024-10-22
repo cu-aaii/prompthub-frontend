@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { X, Check } from "lucide-react"
+import { X, Check, Link as LinkIcon } from "lucide-react"
 
 interface FloatingDescriptionProps {
+  id: string
   name: string
   authors: string[]
   institution: string
@@ -12,6 +13,7 @@ interface FloatingDescriptionProps {
 }
 
 export function FloatingDescription({
+  id,
   name,
   authors,
   institution,
@@ -20,11 +22,19 @@ export function FloatingDescription({
   onClose
 }: FloatingDescriptionProps) {
   const [copied, setCopied] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000) // Reset after 2 seconds
+  }
+
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/prompts/${id}`
+    navigator.clipboard.writeText(link)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000) // Reset after 2 seconds
   }
 
   return (
@@ -45,18 +55,34 @@ export function FloatingDescription({
           
           <div className="mb-4 bg-gray-100 p-4 rounded-md">
             <pre className="whitespace-pre-wrap mb-2">{text}</pre>
-            <Button 
-              onClick={handleCopyPrompt}
-              className={copied ? "bg-green-500 hover:bg-green-600" : ""}
-            >
-              {copied ? (
-                <>
-                  <Check className="mr-2 h-4 w-4" /> Copied!
-                </>
-              ) : (
-                "Copy Prompt"
-              )}
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={handleCopyPrompt}
+                className={copied ? "bg-green-500 hover:bg-green-600" : ""}
+              >
+                {copied ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" /> Copied!
+                  </>
+                ) : (
+                  "Copy Prompt"
+                )}
+              </Button>
+              <Button
+                onClick={handleCopyLink}
+                className={linkCopied ? "bg-green-500 hover:bg-green-600" : ""}
+              >
+                {linkCopied ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" /> Link Copied!
+                  </>
+                ) : (
+                  <>
+                    <LinkIcon className="mr-2 h-4 w-4" /> Copy Link
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
           
           <div className="bg-blue-50 p-4 rounded-md">
