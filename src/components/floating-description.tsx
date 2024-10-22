@@ -55,7 +55,7 @@ export function FloatingDescription({
           
           <div className="mb-4 bg-gray-100 p-4 rounded-md">
             <pre className="whitespace-pre-wrap mb-2">{text}</pre>
-            <div className="flex space-x-2">
+            <div>
               <Button 
                 onClick={handleCopyPrompt}
                 className={copied ? "bg-green-500 hover:bg-green-600" : ""}
@@ -68,26 +68,29 @@ export function FloatingDescription({
                   "Copy Prompt"
                 )}
               </Button>
-              <Button
-                onClick={handleCopyLink}
-                className={linkCopied ? "bg-green-500 hover:bg-green-600" : ""}
-              >
-                {linkCopied ? (
-                  <>
-                    <Check className="mr-2 h-4 w-4" /> Link Copied!
-                  </>
-                ) : (
-                  <>
-                    <LinkIcon className="mr-2 h-4 w-4" /> Copy Link
-                  </>
-                )}
-              </Button>
             </div>
           </div>
           
-          <div className="bg-blue-50 p-4 rounded-md">
+          <div className="bg-blue-50 p-4 rounded-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Usage Information</h3>
             <pre className="whitespace-pre-wrap">{description}</pre>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={handleCopyLink}
+              className={linkCopied ? "bg-green-500 hover:bg-green-600" : ""}
+            >
+              {linkCopied ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" /> Link Copied!
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="mr-2 h-4 w-4" /> Copy Link to this card
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
