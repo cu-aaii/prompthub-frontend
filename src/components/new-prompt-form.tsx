@@ -86,7 +86,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     if (existingPromptNames.includes(formData.promptName.toLowerCase())) {
       toast({
         title: "Error",
-        description: "A prompt with this name already exists. Please choose a different name.",
+        description: "A prompt with this title already exists. Please choose a different title.",
         variant: "destructive",
       })
       return
