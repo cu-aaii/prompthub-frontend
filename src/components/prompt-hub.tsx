@@ -21,6 +21,7 @@ interface Prompt {
   name: string
   text: string
   description: string
+  summary: string
   tags: string[]
   meta: {
     author: string[]
@@ -47,6 +48,7 @@ function PromptHubContent() {
         return {
           ...prompt,
           ID: prompt.ID,
+          summary: prompt.summary,
           tags: prompt.tags.length === 1 && prompt.tags[0].includes(',') 
             ? prompt.tags[0].split(',').map((tag: string) => tag.trim())
             : prompt.tags,
@@ -58,6 +60,7 @@ function PromptHubContent() {
           }
         }
       })
+      console.log(transformedData)
       setPrompts(transformedData)
       const allTags = transformedData.flatMap((prompt: Prompt) => prompt.tags)
       const uniqueTagsSet = new Set(allTags)
@@ -157,7 +160,7 @@ function PromptHubContent() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-start">
           <Link href="/" className="flex items-center">
             <Image src={Logo} alt="PromptHub Logo" width={32} height={32} className="mr-2" />
-            <span className="text-2xl font-bold text-blue-600">Higher Ed Prompt Hub</span>
+            <span className="text-2xl font-bold text-[#B31B1B]">Higher Ed Prompt Hub</span>
           </Link>
         </div>
       </header>
@@ -204,11 +207,8 @@ function PromptHubContent() {
               </CardHeader>
               <CardContent>
                 <pre className="text-sm text-gray-500 mb-2 whitespace-pre-wrap overflow-hidden" style={{ maxHeight: '100px' }}>
-                  {prompt.text}
+                  {prompt.summary}
                 </pre>
-                <p className="text-sm text-blue-500 mb-2">
-                  {"Click on the card to see Usage Information"}
-                </p>
                 <div className="flex flex-wrap gap-2">
                   {prompt.tags.map((tag, tagIndex) => (
                     <Badge key={tagIndex} variant="secondary">

@@ -27,6 +27,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
     email: '',
     tags: '',
     promptName: '',
+    promptSummary: '',
     promptText: '',
     description: ''
   })
@@ -89,6 +90,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           email: formData.email,
           tags: formData.tags,
           promptName: formData.promptName,
+          promptSummary: formData.promptSummary,
           promptText: formData.promptText,
           description: formData.description
         }),
@@ -156,6 +158,17 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           <div>
             <Label htmlFor="promptName">Prompt Title</Label>
             <Input id="promptName" name="promptName" value={formData.promptName} onChange={handleChange} required />
+          </div>
+          <div>
+            <Label htmlFor="promptSummary">Prompt Summary</Label>
+            <Textarea 
+              id="promptSummary" 
+              name="promptSummary" 
+              value={formData.promptSummary} 
+              onChange={handleChange} 
+              required 
+              placeholder="Provide a brief summary of what the prompt does"
+            />
           </div>
           <div>
             <Label htmlFor="promptText">Prompt Text</Label>
