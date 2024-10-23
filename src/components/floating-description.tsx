@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { X, Check, Link as LinkIcon } from "lucide-react"
+import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
+import '@/styles/markdown.css'
+import { Components } from 'react-markdown'
 
 interface FloatingDescriptionProps {
   id: string
@@ -36,6 +41,17 @@ export function FloatingDescription({
     setLinkCopied(true)
     setTimeout(() => setLinkCopied(false), 2000)
   }
+
+  const customRenderers: Components = {
+    text: ({ children }) => {
+      if (typeof children === 'string') {
+        return <>{children.split('++').map((part, index) => 
+          index % 2 === 0 ? part : <u key={index}>{part}</u>
+        )}</>;
+      }
+      return <>{children}</>;
+    },
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -73,7 +89,14 @@ export function FloatingDescription({
           
           <div className="bg-blue-50 p-4 rounded-md mb-4">
             <h3 className="text-lg font-semibold mb-2">Usage Information</h3>
-            <pre className="whitespace-pre-wrap">{description}</pre>
+            <ReactMarkdown 
+              rehypePlugins={[rehypeRaw]}
+              remarkPlugins={[remarkGfm]}
+              components={customRenderers}
+              className="markdown-content"
+            >
+              {description}
+            </ReactMarkdown>
           </div>
 
           <div className="flex justify-end">

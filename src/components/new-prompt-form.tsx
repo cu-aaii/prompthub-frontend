@@ -5,6 +5,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import dynamic from 'next/dynamic'
+import ReactMarkdown from 'react-markdown'
+
+// Dynamically import MarkdownEditor to avoid SSR issues
+const MarkdownEditor = dynamic(() => import('react-markdown-editor-lite'), {
+  ssr: false
+})
+import 'react-markdown-editor-lite/lib/index.css'
 
 const institutions = [
   "University of Chicago",
@@ -62,6 +70,14 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prevData => ({ ...prevData, [name]: value }))
+  }
+
+  const handleEditorChange = ({ text }: { text: string }) => {
+    setFormData(prevData => ({ ...prevData, description: text }))
+  }
+
+  const renderHTML = (text: string) => {
+    return <ReactMarkdown>{text}</ReactMarkdown>
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -208,13 +224,12 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           </div>
           <div>
             <Label htmlFor="description">Usage Information</Label>
-            <Textarea 
-              id="description" 
-              name="description" 
-              value={formData.description} 
-              onChange={handleChange} 
-              required 
-              placeholder="Provide any relevant information about using this prompt, such as examples, tips, or suggestions"
+            <MarkdownEditor
+              value={formData.description}
+              onChange={handleEditorChange}
+              style={{ height: '300px' }}
+              renderHTML={renderHTML}
+              placeholder="Provide any relevant information about using this prompt, such as examples, tips, or suggestions. You can use Markdown for formatting."
             />
           </div>
           <div className="flex justify-end space-x-4">
