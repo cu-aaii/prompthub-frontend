@@ -125,7 +125,14 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Your Name</Label>
-            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+            <Input 
+              id="name" 
+              name="name" 
+              value={formData.name} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter your full name"
+            />
           </div>
           <div>
             <Label htmlFor="institution">Institution</Label>
@@ -157,7 +164,14 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           </div>
           <div>
             <Label htmlFor="promptName">Prompt Title</Label>
-            <Input id="promptName" name="promptName" value={formData.promptName} onChange={handleChange} required />
+            <Input 
+              id="promptName" 
+              name="promptName" 
+              value={formData.promptName} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter a concise and descriptive title for your prompt"
+            />
           </div>
           <div>
             <Label htmlFor="promptSummary">Prompt Summary</Label>
@@ -172,11 +186,25 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           </div>
           <div>
             <Label htmlFor="promptText">Prompt Text</Label>
-            <Textarea id="promptText" name="promptText" value={formData.promptText} onChange={handleChange} required />
+            <Textarea 
+              id="promptText" 
+              name="promptText" 
+              value={formData.promptText} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter the full text of your prompt here"
+            />
           </div>
           <div>
             <Label htmlFor="tags">Tags (comma-separated)</Label>
-            <Input id="tags" name="tags" value={formData.tags} onChange={handleChange} required />
+            <Input 
+              id="tags" 
+              name="tags" 
+              value={formData.tags} 
+              onChange={handleChange} 
+              required 
+              placeholder="e.g., AI, Machine Learning, Data Science"
+            />
           </div>
           <div>
             <Label htmlFor="description">Usage Information</Label>
