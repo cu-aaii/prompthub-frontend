@@ -43,14 +43,28 @@ export function FloatingDescription({
   }
 
   const customRenderers: Components = {
-    text: ({ children }) => {
+    p: ({ children }) => {
       if (typeof children === 'string') {
-        return <>{children.split('++').map((part, index) => 
-          index % 2 === 0 ? part : <u key={index}>{part}</u>
-        )}</>;
+        const parts = children.split(/(\+\+.*?\+\+)/g);
+        return (
+          <p>
+            {parts.map((part, index) => {
+              if (part.startsWith('++') && part.endsWith('++')) {
+                return <u key={index}>{part.slice(2, -2)}</u>;
+              }
+              return part;
+            })}
+          </p>
+        );
       }
-      return <>{children}</>;
+      return <p>{children}</p>;
     },
+    ul: ({ children }) => (
+      <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>{children}</ul>
+    ),
+    ol: ({ children }) => (
+      <ol style={{ listStyleType: 'decimal', paddingLeft: '20px' }}>{children}</ol>
+    ),
   };
 
   return (
