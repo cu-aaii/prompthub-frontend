@@ -167,7 +167,7 @@ function PromptHubContent() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold">Explore Prompts</h1>
-          <Button onClick={handleNewPromptRequest}>Submit a request for a new prompt</Button>
+          <Button onClick={handleNewPromptRequest}>Submit a new prompt</Button>
         </div>
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-4">
