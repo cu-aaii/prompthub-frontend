@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import dynamic from 'next/dynamic'
+import ReactMarkdown from 'react-markdown'
+
+// Dynamically import MarkdownEditor to avoid SSR issues
+const MarkdownEditor = dynamic(() => import('react-markdown-editor-lite'), {
+  ssr: false
+})
+import 'react-markdown-editor-lite/lib/index.css'
 
 const institutions = [
   "University of Chicago",
@@ -22,28 +30,72 @@ interface NewPromptFormProps {
 
 export function NewPromptForm({ onClose }: NewPromptFormProps) {
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    institution: 'University of Chicago',
-    email: 'john.doe@example.com',
-    tags: 'AI, Machine Learning, Data Science',
-    promptName: 'Sample Prompt',
-    promptText: 'This is a sample prompt text for testing purposes.',
-    description: 'This is a sample description for the prompt. It provides usage information and examples.'
+    name: '',
+    institution: '',
+    email: '',
+    tags: '',
+    promptName: '',
+    promptSummary: '',
+    promptText: '',
+    description: ''
   })
+  // const [formData, setFormData] = useState({
+  //   name: 'John Doe',
+  //   institution: 'University of Chicago',
+  //   email: 'john.doe@example.com',
+  //   tags: 'AI, Machine Learning, Data Science',
+  //   promptName: 'Sample Prompt',
+  //   promptText: 'This is a sample prompt text for testing purposes.',
+  //   description: 'This is a sample description for the prompt. It provides usage information and examples.'
+  // })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [existingPromptNames, setExistingPromptNames] = useState<string[]>([])
   const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchExistingPromptNames = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts`)
+        const data = await response.json()
+        const names = data.map((prompt: any) => prompt.name.toLowerCase())
+        setExistingPromptNames(names)
+      } catch (error) {
+        console.error('Error fetching existing prompt names:', error)
+      }
+    }
+
+    fetchExistingPromptNames()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prevData => ({ ...prevData, [name]: value }))
   }
 
+  const handleEditorChange = ({ text }: { text: string }) => {
+    setFormData(prevData => ({ ...prevData, description: text }))
+  }
+
+  const renderHTML = (text: string) => {
+    return <ReactMarkdown>{text}</ReactMarkdown>
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (existingPromptNames.includes(formData.promptName.toLowerCase())) {
+      toast({
+        title: "Error",
+        description: "A prompt with this title already exists. Please choose a different title.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('http://localhost:80/prompts/request', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/prompts/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,8 +104,9 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
           name: formData.name,
           institution: formData.institution,
           email: formData.email,
-          tags: formData.tags.split(',').map(tag => tag.trim()), // Convert comma-separated string to array
+          tags: formData.tags,
           promptName: formData.promptName,
+          promptSummary: formData.promptSummary,
           promptText: formData.promptText,
           description: formData.description
         }),
@@ -66,7 +119,7 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
       const result = await response.json()
       toast({
         title: "Success",
-        description: "Your prompt request has been submitted successfully.",
+        description: "Your prompt request has been submitted successfully. We'll notify you of the response to your request at the email address you provided. If approved, the prompt will be added to PromptHub shortly.",
       })
       onClose()
     } catch (error) {
@@ -88,7 +141,14 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Your Name</Label>
-            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+            <Input 
+              id="name" 
+              name="name" 
+              value={formData.name} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter your full name"
+            />
           </div>
           <div>
             <Label htmlFor="institution">Institution</Label>
@@ -119,26 +179,57 @@ export function NewPromptForm({ onClose }: NewPromptFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="tags">Tags (comma-separated)</Label>
-            <Input id="tags" name="tags" value={formData.tags} onChange={handleChange} required />
+            <Label htmlFor="promptName">Prompt Title</Label>
+            <Input 
+              id="promptName" 
+              name="promptName" 
+              value={formData.promptName} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter a concise and descriptive title for your prompt"
+            />
           </div>
           <div>
-            <Label htmlFor="promptName">Prompt Title</Label>
-            <Input id="promptName" name="promptName" value={formData.promptName} onChange={handleChange} required />
+            <Label htmlFor="promptSummary">Prompt Summary</Label>
+            <Textarea 
+              id="promptSummary" 
+              name="promptSummary" 
+              value={formData.promptSummary} 
+              onChange={handleChange} 
+              required 
+              placeholder="Provide a brief summary of what the prompt does"
+            />
           </div>
           <div>
             <Label htmlFor="promptText">Prompt Text</Label>
-            <Textarea id="promptText" name="promptText" value={formData.promptText} onChange={handleChange} required />
+            <Textarea 
+              id="promptText" 
+              name="promptText" 
+              value={formData.promptText} 
+              onChange={handleChange} 
+              required 
+              placeholder="Enter the full text of your prompt here"
+            />
+          </div>
+          <div>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input 
+              id="tags" 
+              name="tags" 
+              value={formData.tags} 
+              onChange={handleChange} 
+              required 
+              placeholder="e.g., AI, Machine Learning, Data Science"
+            />
           </div>
           <div>
             <Label htmlFor="description">Usage Information</Label>
-            <Textarea 
-              id="description" 
-              name="description" 
-              value={formData.description} 
-              onChange={handleChange} 
-              required 
-              placeholder="Provide any relevant information about using this prompt, such as examples, tips, or suggestions"
+            <MarkdownEditor
+              value={formData.description}
+              onChange={handleEditorChange}
+              style={{ height: '300px' }}
+              renderHTML={renderHTML}
+              placeholder="Provide any relevant information about using this prompt, such as examples, tips, or suggestions. You can use Markdown for formatting."
             />
           </div>
           <div className="flex justify-end space-x-4">
